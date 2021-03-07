@@ -8,7 +8,7 @@ from kl_node import KLNode
 from arms import BenoulliArms
 
 class GosInE:
-    def __init__(self, n, arms : BenoulliArms, node_type = "UCB", eps = 1, alpha = 1):
+    def __init__(self, n, arms, node_type = "UCB", eps = 1, alpha = 1):
         """docstring for __init__"""
         self.arms = arms
 
@@ -75,28 +75,3 @@ class GosInE:
 
     def adjust_comm_budget(self, comm_budget):
         return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + self.eps))) for i in range(len(comm_budget))]
-
-
-if __name__ == '__main__':
-    t = 10000
-    arms = BenoulliArms([0.9, 0.5, 0.5, 0.5])
-    unif = [[np.random.uniform() for _ in range(t)],
-            [np.random.uniform() for _ in range(t)],
-            [np.random.uniform() for _ in range(t)],
-            [np.random.uniform() for _ in range(t)]]
-
-    print("UCB results")
-    ucb = GosInE(2, arms, node_type="UCB")
-    ucb.play_unif(t, range(t), unif)
-
-    for node in ucb.nodes:
-        print(max(ucb.arms.means) * t- sum(node.rewards))
-
-
-    print("KLUCB results")
-    klucb = GosInE(2, arms, node_type="KL_UCB")
-    klucb.play_unif(t, range(t), unif)
-
-    for node in klucb.nodes:
-        print(max(klucb.arms.means) * t - sum(node.rewards))
-        print(node.times_played)
