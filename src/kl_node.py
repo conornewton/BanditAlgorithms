@@ -6,22 +6,25 @@ from scipy.optimize import bisect
 from node import Node
 
 class KLNode(Node):
-    def __init__(self, sticky_arms, arm1, arm2):
+    def __init__(self, sticky_arms, arm1, arm2, c = 0):
         Node.__init__(self, sticky_arms, arm1, arm2)
+        self.c = c
 
 
     def play(self, t):
         max_arm_id = 0
         kl_ucb = [0] * len(self.arms)
 
+        # If an arm has not been played, play it!
         for i in range(len(kl_ucb)):
             if self.times_played[self.arms[i]] == 0:
                 return self.arms[i]
 
 
+        for i in range(len(kl_ucb)):
             empirical_mean = self.empirical_means[self.arms[i]]
             times_played = self.times_played[self.arms[i]]
-            kl_ucb_ineq = lambda x: times_played * self.KL(empirical_mean, x) - math.log(t)
+            kl_ucb_ineq = lambda x: times_played * self.KL(empirical_mean, x) - self.exploration(t)
 
             if kl_ucb_ineq(1) <= 0:
                 kl_ucb[i] = 1
@@ -40,6 +43,9 @@ class KLNode(Node):
                 max_arm_id = i
 
         return self.arms[max_arm_id]
+
+    def exploration(self, t):
+        return math.log(t) + self.c * math.log(math.log(t))
 
 
     def KL(self, p, q):
