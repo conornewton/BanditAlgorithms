@@ -1,4 +1,5 @@
 from scipy.stats import bernoulli
+from random import shuffle
 
 class BenoulliArms:
     def __init__(self, arm_means):
@@ -13,3 +14,28 @@ class BenoulliArms:
             return 1
         else:
             return 0
+
+
+def param_arms(delta, high, low, k):
+    """
+    Simulates the Multi-agent MAB for a range of parameters
+
+        Parameters:
+            delta (float): difference between the largest and second largest mean
+            high  (float): highest mean
+            low   (float): lowest mean
+        Returns:
+            arms (BernoulliArms): An object of BernoulliArms
+    """
+    arm_means = []
+    arm_means.append(high)
+
+    width = (high - delta - low) / (k - 1)
+
+    for i in range(k - 1):
+        arm_means.append(high - delta - width * i)
+
+    shuffle(arm_means)
+
+    return BenoulliArms(arm_means)
+
