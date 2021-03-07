@@ -1,9 +1,8 @@
 import math
-
 import numpy as np
 
-from scipy.optimize import minimize
-from scipy.optimize import NonlinearConstraint
+from scipy.optimize import bisect
+
 from node import Node
 
 class KLNode(Node):
@@ -24,16 +23,17 @@ class KLNode(Node):
             times_played = self.times_played[self.arms[i]]
             kl_ucb_ineq = lambda x: times_played * self.KL(empirical_mean, x) - math.log(t)
 
-            # nlc1 = NonlinearConstraint(kl_ucb_ineq, np.inf, 0)
-            # nlc2 = NonlinearConstraint(lambda x: x, 0, 1)
-            # # bounds = Bounds(0.000001, 0.999999, keep_feasible = True)
+            if kl_ucb_ineq(1) <= 0:
+                kl_ucb[i] = 1
+            else:
+                try:
+                    kl_ucb[i] = bisect(kl_ucb_ineq, empirical_mean, 1)
+                except ValueError as e:
+                    print(empirical_mean)
+                    print(kl_ucb_ineq(empirical_mean), kl_ucb_ineq(1))
 
-            # res = minimize(lambda x: -x, 0.5, constraints=[nlc1, nlc2], method="COBYLA")
-            # kl_ucb[i] = res.x
-            # # minimize(lambda x: -x, 0.5, bounds = bounds, constraints=[nlc1, nlc2], method="COBYLA")
-            # print(res.success)
 
-            kl_ucb[i] = self.max_ineq(kl_ucb_ineq, empirical_mean)
+            # kl_ucb[i] = self.max_ineq(kl_ucb_ineq, empirical_mean)
             # print(kl_ucb)
 
             if kl_ucb[i] > kl_ucb[max_arm_id]:
@@ -44,8 +44,6 @@ class KLNode(Node):
 
     def KL(self, p, q):
         try:
-            if q <= 0 :
-                return 1000000000000000
             if p == 0 and q != 1:
                 return math.log(1 / (1 - q))
             if p == 1 and q != 0:
