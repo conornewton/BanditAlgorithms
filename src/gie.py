@@ -18,12 +18,12 @@ class GosInE:
         if node_type == "UCB":
             self.nodes = [UCBNode([(((i - 1) * sss + j) % k) for j in range(sss)],
                                   (i * sss) % k,
-                                  (i * sss + 1) % k, alpha)
+                                  (i * sss + 1) % k, alpha, k)
                           for i in range(1, n + 1)]
         else:
             self.nodes = [KLNode([(((i - 1) * sss + j) % k) for j in range(sss)],
                                   (i * sss) % k,
-                                  (i * sss + 1) % k)
+                                  (i * sss + 1) % k, k)
                           for i in range(1, n + 1)]
         self.time = 0
         self.phase = 0
@@ -75,3 +75,12 @@ class GosInE:
 
     def adjust_comm_budget(self, comm_budget):
         return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + self.eps))) for i in range(len(comm_budget))]
+
+    def average_regret(self):
+        avg_regret = np.zeros(len(self.nodes[0].rewards))
+
+        for node in self.nodes:
+            avg_regret = np.add(avg_regret, node.regret(self.arms.max_mean()))
+
+        avg_regret = np.true_divide(avg_regret, len(self.nodes))
+        return avg_regret
