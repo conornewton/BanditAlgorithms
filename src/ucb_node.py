@@ -3,8 +3,8 @@ import math
 from node import Node
 
 class UCBNode(Node):
-    def __init__(self, sticky_arms, arm1, arm2, alpha):
-        Node.__init__(self, sticky_arms, arm1, arm2)
+    def __init__(self, sticky_arms, arm1, arm2, alpha, k):
+        Node.__init__(self, sticky_arms, arm1, arm2, k)
         self.alpha = alpha
 
 

@@ -6,8 +6,8 @@ from scipy.optimize import bisect
 from node import Node
 
 class KLNode(Node):
-    def __init__(self, sticky_arms, arm1, arm2, c = 0):
-        Node.__init__(self, sticky_arms, arm1, arm2)
+    def __init__(self, sticky_arms, arm1, arm2, k, c = 0):
+        Node.__init__(self, sticky_arms, arm1, arm2, k)
         self.c = c
 
 
