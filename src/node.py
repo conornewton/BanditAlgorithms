@@ -5,7 +5,7 @@ import numpy as np
 from scipy.optimize import newton
 
 class Node:
-    def __init__(self, sticky_arms, arm1, arm2):
+    def __init__(self, sticky_arms, arm1, arm2, k):
         self.arms = sticky_arms
         self.arms.append(arm1)
         self.arms.append(arm2)
@@ -15,12 +15,12 @@ class Node:
 
         self.recommendations_recieved = []
 
-        self.rewards_per_arm = [0] * len(self.arms)
-        self.times_played = [0] * len(self.arms)# Times each arm has been played
-        self.empirical_means = [0] * len(self.arms)
+        self.rewards_per_arm = [0] * k
+        self.times_played = [0] * k
+        self.empirical_means = [0] * k
 
         self.phase = 0
-        self.times_played_phase = [0] * len(self.arms)
+        self.times_played_phase = [0] * k
 
     def recieve_reward(self, arm_id, reward):
         self.history.append(arm_id)
@@ -28,14 +28,15 @@ class Node:
 
         self.rewards_per_arm[arm_id] += reward
         self.times_played[arm_id] += 1
+        self.times_played_phase[arm_id] += 1
         self.empirical_means[arm_id] = self.rewards_per_arm[arm_id] / self.times_played[arm_id]
 
-        self.recommendations_recieved.append(arm_id)
 
     def give_recommendation(self):
-        return self.arms[self.times_played_phase.index(max(self.times_played_phase))]
+        return self.times_played_phase.index(max(self.times_played_phase))
 
     def recieve_recommendation(self, arm_id):
+        self.recommendations_recieved.append(arm_id)
         if arm_id in (self.arms[-1], self.arms[-2]):
             pass
         elif self.times_played_phase[-1] > self.times_played_phase[-2]:
@@ -45,7 +46,7 @@ class Node:
 
         # Move to next phase
         self.phase += 1
-        self.times_played_phase = [0] * len(self.arms)
+        self.times_played_phase = [0] * len(self.times_played_phase)
 
     def cum_reward(self):
         cum = self.rewards
