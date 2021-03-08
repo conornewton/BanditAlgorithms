@@ -6,6 +6,9 @@ class BenoulliArms:
         self.means   = arm_means
         self.no_arms = len(arm_means)
 
+    def max_mean(self):
+        return max(self.means)
+
     def play(self, arm_id):
         return bernoulli.rvs(self.means[arm_id], size = 1)
 
