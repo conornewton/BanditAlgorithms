@@ -4,6 +4,7 @@
 
 import numpy as np
 
+import matplotlib.pyplot as plt
 
 def average_regret(nodes, max_mean):
     """
@@ -27,3 +28,13 @@ def average_results(results):
 
     avg_res = np.true_divide(avg_res, len(results))
     return avg_res
+
+def plot_regret(ucb_regret, kl_regret):
+    """
+        Plot ucb vs klucb regret
+    """
+    plt.plot(ucb_regret, 'r')
+    plt.plot(kl_regret, 'g')
+    plt.xlabel("T")
+    plt.ylabel("Regret")
+    plt.show()
