@@ -14,6 +14,7 @@ class Node:
         self.rewards = [] # Rewards from previous arm pulls
 
         self.recommendations_recieved = []
+        self.recommendations_recieved_node = []
 
         self.rewards_per_arm = [0] * k
         self.times_played = [0] * k
@@ -35,15 +36,18 @@ class Node:
     def give_recommendation(self):
         return self.times_played_phase.index(max(self.times_played_phase))
 
-    def recieve_recommendation(self, arm_id):
+    def recieve_recommendation(self, arm_id, comm_node):
         self.recommendations_recieved.append(arm_id)
-        if arm_id in (self.arms[-1], self.arms[-2]):
+        self.recommendations_recieved_node.append(comm_node)
+        if arm_id in self.arms:
             pass
-        elif self.times_played_phase[-1] > self.times_played_phase[-2]:
+        elif self.times_played_phase[self.arms[-1]] > self.times_played_phase[self.arms[-2]]:
             self.arms[-2] = arm_id
         else:
             self.arms[-1] = arm_id
 
+
+    def next_phase(self):
         # Move to next phase
         self.phase += 1
         self.times_played_phase = [0] * len(self.times_played_phase)
@@ -61,3 +65,11 @@ class Node:
             cum[i] = i * mean - cum[i]
         return cum
 
+
+    def when_recieved_arm(self, arm_id):
+        """
+            Returns the phase when an arm was recommended
+        """
+        if arm_id in self.arms[:-2]:
+            return 0
+        return self.recommendations_recieved.index(arm_id)

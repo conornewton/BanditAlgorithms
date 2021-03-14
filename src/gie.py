@@ -42,8 +42,7 @@ class GosInE:
                     row_i.append(prob)
             self.comm_matrix.append(row_i)
 
-    def play(self, t, comm_budget):
-        comm_rounds = self.adjust_comm_budget(comm_budget)
+    def play(self, t, comm_rounds):
 
         for i in range(t):
             for node in self.nodes:
@@ -53,13 +52,20 @@ class GosInE:
             if i == comm_rounds[self.phase]:
                 for j in range(len(self.nodes)):
                     comm_node_id = random.choices(range(len(self.nodes)), self.comm_matrix[j], k = 1)[0]
-                    self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].give_recommendation())
+                    self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].give_recommendation(), comm_node_id)
 
                 self.phase += 1
 
+    def play_unif_no_comm(self, t, unif):
+        for i in range(t):
+            for node in self.nodes:
+                arm_id = node.play(i)
+                node.recieve_reward(arm_id, self.arms.play_unif(arm_id, unif[arm_id][i]))
+
+
+
     # Takes a list or uniform randomly generated numbers used for the random generation
-    def play_unif(self, t, comm_budget, unif):
-        comm_rounds = self.adjust_comm_budget(comm_budget)
+    def play_unif(self, t, comm_rounds, unif):
 
         for i in range(t):
             for node in self.nodes:
@@ -69,9 +75,11 @@ class GosInE:
             if i == comm_rounds[self.phase]:
                 for j in range(len(self.nodes)):
                     comm_node_id = random.choices(range(len(self.nodes)), self.comm_matrix[j], k = 1)[0]
-                    self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].give_recommendation())
+                    self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].give_recommendation(), comm_node_id)
 
                 self.phase += 1
+                for node in self.nodes:
+                    node.next_phase()
 
     def adjust_comm_budget(self, comm_budget):
         return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + self.eps))) for i in range(len(comm_budget))]
