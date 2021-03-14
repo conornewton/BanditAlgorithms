@@ -9,6 +9,12 @@ class BenoulliArms:
     def max_mean(self):
         return max(self.means)
 
+    def best_arm(self):
+        """
+            Returns the id (index) of the arm with the highest mean
+        """
+        return self.means.index(self.max_mean())
+
     def play(self, arm_id):
         return bernoulli.rvs(self.means[arm_id], size = 1)
 
