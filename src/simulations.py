@@ -9,9 +9,12 @@ from timeit import default_timer as timer
 from arms import param_arms
 from gie import GosInE
 
-# TODO: this is very slow
-def adjust_comm_budget(comm_budget, eps):
-    return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + eps))) for i in range(len(comm_budget))]
+def adjust_comm_budget(length, eps):
+    comm_rounds = [0]
+    # return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + eps))) for i in range(len(comm_budget))]
+    while comm_rounds[-1] < length:
+        comm_rounds.append(math.floor(len(comm_rounds) ** 3))
+    return comm_rounds
 
 def simulate(delta, high, low):
     start = timer()
@@ -20,7 +23,7 @@ def simulate(delta, high, low):
     n = 5  # Number of nodes
     iters = 2 # Number of times to repeat the simulation
 
-    comm_rounds = adjust_comm_budget(range(100000), 0.1)
+    comm_rounds = adjust_comm_budget(100000, 0.1)
 
     for i in range(iters):
         arms = param_arms(delta, high, low, k)
