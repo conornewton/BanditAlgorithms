@@ -33,6 +33,7 @@ def param_arms(delta, high, low, k):
             delta (float): difference between the largest and second largest mean
             high  (float): highest mean
             low   (float): lowest mean
+            k     (int)  : number of arms
         Returns:
             arms (BernoulliArms): An object of BernoulliArms
     """
