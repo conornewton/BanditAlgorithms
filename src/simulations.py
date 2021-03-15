@@ -4,6 +4,7 @@ import pickle
 import sys
 import numpy as np
 import math
+import itertools
 
 from timeit import default_timer as timer
 from arms import param_arms
@@ -21,7 +22,7 @@ def simulate(delta, high, low):
     t = 100000
     k = 20 # Number of arms
     n = 5  # Number of nodes
-    iters = 2 # Number of times to repeat the simulation
+    iters = 10 # Number of times to repeat the simulation
 
     comm_rounds = adjust_comm_budget(100000, 0.1)
 
@@ -30,12 +31,12 @@ def simulate(delta, high, low):
         unif = [[np.random.uniform() for _ in range(t)] for _ in range(k)]
 
         out_ucb = GosInE(n, arms, node_type = "UCB", eps = 0.1, alpha = 4)
-        out_ucb.play_unif(t, range(100000), unif),
+        out_ucb.play_unif(t, comm_rounds, unif),
 
         print(f"ucb{i}\t time taken: {timer() - start}")
 
         out_klucb = GosInE(n, arms, node_type = "KL-UCB", eps = 0.1)
-        out_klucb.play_unif(t, range(100000), unif)
+        out_klucb.play_unif(t, comm_rounds, unif)
 
         print(f"klucb{i}\t time taken: {timer() - start}")
 
@@ -44,9 +45,16 @@ def simulate(delta, high, low):
 
 if __name__ == "__main__":
     task_num = int(sys.argv[1])
-    param_array = [[0.2, 0.7, 0.5]]
+
+    width_min  = 0
+    width_step = 0.025
+    width_max  = 0.25
+
+    # Distances between best arm and second best arm
+    widths = [width_step * i for i in range(int((width_max - width_min) / width_step) + 1)]
+
+    # len 275
+    param_array = list(itertools.product(widths, [0.75, 0.7, 0.65, 0.55, 0.5], [0.5, 0.45, 0.4, 0.35, 0.3]))
 
     params = param_array[task_num]
-
     simulate(params[0], params[1], params[2])
-
