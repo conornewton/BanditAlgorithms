@@ -17,7 +17,7 @@ class UCBNode(Node):
                 return self.arms[i]
 
             # ucb[i] = self.empirical_means[self.arms[i]] + math.sqrt(self.alpha * math.log(t) / self.times_played[self.arms[i]])
-            ucb[i] = self.empirical_means[self.arms[i]] + math.sqrt(2 * math.log(1 + t * math.log(math.log(t))) / self.times_played[self.arms[i]])
+            ucb[i] = self.empirical_means[self.arms[i]] + math.sqrt(2 * math.log(1 + t * math.log(t) ** 2) / self.times_played[self.arms[i]])
 
             if ucb[i] > ucb[max_arm_id]:
                 max_arm_id = i

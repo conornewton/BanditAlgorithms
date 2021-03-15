@@ -41,7 +41,7 @@ class KLNode(Node):
         return self.arms[max_arm_id]
 
     def exploration(self, t):
-        return math.log(1 + t * math.log(math.log(t))) # From bandit algorithms
+        return math.log(1 + t * math.log(t) ** 2) # From bandit algorithms
         # return math.log(t) + self.c * math.log(math.log(t))
 
 
