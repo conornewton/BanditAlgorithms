@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from scipy.optimize import bisect
+from scipy.optimize import brentq
 
 from node import Node
 
@@ -29,11 +29,7 @@ class KLNode(Node):
             if kl_ucb_ineq(1) <= 0:
                 kl_ucb[i] = 1
             else:
-                try:
-                    kl_ucb[i] = bisect(kl_ucb_ineq, empirical_mean, 1)
-                except ValueError as e:
-                    print(empirical_mean)
-                    print(kl_ucb_ineq(empirical_mean), kl_ucb_ineq(1))
+                kl_ucb[i] = brentq(kl_ucb_ineq, empirical_mean, 1)
 
 
             # kl_ucb[i] = self.max_ineq(kl_ucb_ineq, empirical_mean)
