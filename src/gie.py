@@ -6,9 +6,10 @@ import numpy as np
 from ucb_node import UCBNode
 from kl_node import KLNode
 from arms import BenoulliArms
+from gossip_matrix import *
 
 class GosInE:
-    def __init__(self, n, arms, node_type = "UCB", eps = 1, alpha = 1):
+    def __init__(self, n, arms, node_type = "UCB", eps = 1, alpha = 1, gossip_matrix = "COMPLETE"):
         """docstring for __init__"""
         self.arms = arms
 
@@ -31,19 +32,14 @@ class GosInE:
         self.eps = eps
         self.alpha = alpha
 
-        self.comm_matrix = []
-        for i in range(n):
-            row_i = []
-            prob = 1 / (n - 1)
-            for j in range(n):
-                if j == i:
-                    row_i.append(0)
-                else:
-                    row_i.append(prob)
-            self.comm_matrix.append(row_i)
+        if gossip_matrix == "COMPLETE":
+            self.gossip_matrix = CompleteGossipMatrix(n)
+        elif gossip_matrix == "STAR":
+            self.gossip_matrix = StarGossipMatrix(n)
+        elif gossip_matrix == "RING":
+            self.gossip_matrix = RingGossipMatrix(n)
 
     def play(self, t, comm_rounds):
-
         for i in range(t):
             for node in self.nodes:
                 arm_id = node.play(i)
@@ -51,7 +47,7 @@ class GosInE:
 
             if i == comm_rounds[self.phase]:
                 for j in range(len(self.nodes)):
-                    comm_node_id = random.choices(range(len(self.nodes)), self.comm_matrix[j], k = 1)[0]
+                    comm_node_id = self.gossip_matrix.sample(j)
                     self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].give_recommendation(), comm_node_id)
 
                 self.phase += 1
@@ -62,11 +58,8 @@ class GosInE:
                 arm_id = node.play(i)
                 node.recieve_reward(arm_id, self.arms.play_unif(arm_id, unif[arm_id][i]))
 
-
-
     # Takes a list or uniform randomly generated numbers used for the random generation
     def play_unif(self, t, comm_rounds, unif):
-
         for i in range(t):
             for node in self.nodes:
                 arm_id = node.play(i)
@@ -74,15 +67,12 @@ class GosInE:
 
             if i == comm_rounds[self.phase]:
                 for j in range(len(self.nodes)):
-                    comm_node_id = random.choices(range(len(self.nodes)), self.comm_matrix[j], k = 1)[0]
+                    comm_node_id = self.gossip_matrix.sample(j)
                     self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].give_recommendation(), comm_node_id)
 
                 self.phase += 1
                 for node in self.nodes:
                     node.next_phase()
-
-    def adjust_comm_budget(self, comm_budget):
-        return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + self.eps))) for i in range(len(comm_budget))]
 
     def average_regret(self):
         avg_regret = np.zeros(len(self.nodes[0].rewards))
