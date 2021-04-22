@@ -44,7 +44,7 @@ def simulate(delta, high, low, alpha):
         pickle.dump(out_klucb, open(f"data/klucb_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
 
 if __name__ == "__main__":
-    # task_num = int(sys.argv[1])
+    task_num = int(sys.argv[1])
     task_num = 1
 
     width_min  = 0
@@ -59,5 +59,4 @@ if __name__ == "__main__":
     param_array = list(itertools.product(widths, [0.75, 0.7, 0.65, 0.6, 0.55, 0.5], [0.5, 0.45, 0.4, 0.35, 0.3], alphas))
 
     params = param_array[task_num]
-    # simulate(params[0], params[1], params[2], params[3])
-    print(len(param_array))
+    simulate(params[0], params[1], params[2], params[3])
