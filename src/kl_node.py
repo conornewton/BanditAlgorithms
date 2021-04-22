@@ -6,8 +6,8 @@ from scipy.optimize import brentq
 from node import Node
 
 class KLNode(Node):
-    def __init__(self, sticky_arms, arm1, arm2, k, c = 0):
-        Node.__init__(self, sticky_arms, arm1, arm2, k)
+    def __init__(self, sticky_arms, arm1, arm2, k, alpha = 1, c = 0):
+        Node.__init__(self, sticky_arms, arm1, arm2, k, alpha)
         self.c = c
 
 
@@ -41,8 +41,7 @@ class KLNode(Node):
         return self.arms[max_arm_id]
 
     def exploration(self, t):
-        return math.log(1 + t * math.log(t) ** 2) # From bandit algorithms
-        # return math.log(t) + self.c * math.log(math.log(t))
+        return math.log(1 + (t ** self.alpha) * math.log(t) ** 2) # From bandit algorithms
 
 
     def KL(self, p, q):

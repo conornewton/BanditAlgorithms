@@ -5,7 +5,7 @@ import numpy as np
 from scipy.optimize import newton
 
 class Node:
-    def __init__(self, sticky_arms, arm1, arm2, k):
+    def __init__(self, sticky_arms, arm1, arm2, k, alpha):
         self.arms = sticky_arms
         self.arms.append(arm1)
         self.arms.append(arm2)
@@ -22,6 +22,8 @@ class Node:
 
         self.phase = 0
         self.times_played_phase = [0] * k
+
+        self.alpha = alpha
 
     def recieve_reward(self, arm_id, reward):
         self.history.append(arm_id)

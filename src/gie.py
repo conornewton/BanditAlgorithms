@@ -9,7 +9,7 @@ from arms import BenoulliArms
 from gossip_matrix import *
 
 class GosInE:
-    def __init__(self, n, arms, node_type = "UCB", eps = 1, alpha = 1, gossip_matrix = "COMPLETE"):
+    def __init__(self, n, arms, node_type = "UCB", gossip_matrix = "COMPLETE", alpha = 1):
         """docstring for __init__"""
         self.arms = arms
 
@@ -19,18 +19,16 @@ class GosInE:
         if node_type == "UCB":
             self.nodes = [UCBNode([(((i - 1) * sss + j) % k) for j in range(sss)],
                                   (i * sss) % k,
-                                  (i * sss + 1) % k, alpha, k)
+                                  (i * sss + 1) % k, k, alpha)
                           for i in range(1, n + 1)]
         else:
             self.nodes = [KLNode([(((i - 1) * sss + j) % k) for j in range(sss)],
                                   (i * sss) % k,
-                                  (i * sss + 1) % k, k)
+                                  (i * sss + 1) % k, k, alpha)
                           for i in range(1, n + 1)]
+
         self.time = 0
         self.phase = 0
-
-        self.eps = eps
-        self.alpha = alpha
 
         if gossip_matrix == "COMPLETE":
             self.gossip_matrix = CompleteGossipMatrix(n)
@@ -73,6 +71,22 @@ class GosInE:
                 self.phase += 1
                 for node in self.nodes:
                     node.next_phase()
+
+    def play_unif_index(self, t, comm_rounds, unif):
+        for i in range(t):
+            for node in self.nodes:
+                arm_id = node.play(i)
+                node.recieve_reward(arm_id, self.arms.play_unif(arm_id, unif[arm_id][i]))
+
+            if i == comm_rounds[self.phase]:
+                for j in range(len(self.nodes)):
+                    comm_node_id = self.gossip_matrix.sample(j)
+                    self.nodes[j].recieve_recommendation(self.nodes[comm_node_id].play(i), comm_node_id)
+
+                self.phase += 1
+                for node in self.nodes:
+                    node.next_phase()
+
 
     def average_regret(self):
         avg_regret = np.zeros(len(self.nodes[0].rewards))
