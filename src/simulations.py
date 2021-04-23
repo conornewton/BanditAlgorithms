@@ -17,7 +17,7 @@ def adjust_comm_budget(length, eps):
         comm_rounds.append(math.floor(len(comm_rounds) ** 3  + 20))
     return comm_rounds
 
-def simulate(delta, high, low, alpha, t = 100000, k = 20, n = 5, iters = 10):
+def simulate(delta, high, low, alpha, t = 100000, k = 20, n = 5, iters = 30):
     start = timer()
 
     comm_rounds = adjust_comm_budget(t, 0.1)
