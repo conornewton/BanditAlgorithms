@@ -17,12 +17,8 @@ def adjust_comm_budget(length, eps):
         comm_rounds.append(math.floor(len(comm_rounds) ** 3  + 20))
     return comm_rounds
 
-def simulate(delta, high, low, alpha):
+def simulate(delta, high, low, alpha, t = 100000, k = 20, n = 5, iters = 10):
     start = timer()
-    t = 100000
-    k = 20 # Number of arms
-    n = 5  # Number of nodes
-    iters = 10 # Number of times to repeat the simulation
 
     comm_rounds = adjust_comm_budget(t, 0.1)
 
@@ -45,18 +41,22 @@ def simulate(delta, high, low, alpha):
 
 if __name__ == "__main__":
     task_num = int(sys.argv[1])
-    task_num = 1
 
     width_min  = 0
     width_step = 0.025
-    width_max  = 0.25
+    width_max  = 0.4
 
     # Distances between best arm and second best arm
     widths = [width_step * i for i in range(int((width_max - width_min) / width_step) + 1)]
 
-    alphas = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 6]
+    alphas = [1]
 
-    param_array = list(itertools.product(widths, [0.75, 0.7, 0.65, 0.6, 0.55, 0.5], [0.5, 0.45, 0.4, 0.35, 0.3], alphas))
+    param_array = list(itertools.product(widths, [0.9], [0.2], alphas))
 
-    params = param_array[task_num]
-    simulate(params[0], params[1], params[2], params[3])
+    params = param_array[task_num % 17]
+    if task_num < 17:
+        simulate(params[0], params[1], params[2], params[3])
+    elif task_num < 34:
+        simulate(params[0], params[1], params[2], params[3], k = 30, n = 10)
+    else:
+        simulate(params[0], params[1], params[2], params[3], k = 50, n = 20)
