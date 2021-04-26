@@ -11,10 +11,9 @@ from arms import param_arms
 from gie import GosInE
 
 def adjust_comm_budget(length, eps):
-    comm_rounds = [20]
-    # return [max(next(filter(lambda t: t >= i, comm_budget)), math.ceil((1 + i) ** (1 + eps))) for i in range(len(comm_budget))]
+    comm_rounds = [0]
     while comm_rounds[-1] < length:
-        comm_rounds.append(math.floor(len(comm_rounds) ** 3  + 20))
+        comm_rounds.append(math.floor(len(comm_rounds) ** 3))
     return comm_rounds
 
 def simulate(delta, high, low, alpha, t = 100000, k = 20, n = 5, iters = 20):
@@ -27,30 +26,30 @@ def simulate(delta, high, low, alpha, t = 100000, k = 20, n = 5, iters = 20):
         unif = [[np.random.uniform() for _ in range(t)] for _ in range(k)]
 
         # out_ucb = GosInE(n, arms, node_type = "UCB", gossip_matrix = "COMPLETE", alpha = alpha)
-        # out_ucb.play_unif(t, comm_rounds, unif),
+        # # out_ucb.play_unif(t, comm_rounds, unif),
 
-        out_klucb = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
-        out_klucb.play_unif(t, comm_rounds, unif),
+        # out_klucb = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
+        # out_klucb.play_unif(t, comm_rounds, unif),
 
-        out_klucb_index = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
-        out_klucb_index.play_unif_index(t, comm_rounds, unif),
+        # out_klucb_index = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
+        # out_klucb_index.play_unif_index(t, comm_rounds, unif),
 
-        pickle.dump(out_klucb_index, open(f"data/klucb_index_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
-        pickle.dump(out_klucb, open(f"data/klucb_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+        # pickle.dump(out_klucb_index, open(f"data/klucb_index_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+        # pickle.dump(out_klucb, open(f"data/klucb_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
         # print(f"ucb{i}\t time taken: {timer() - start}")
 
-        # complete= GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
-        # complete.play_unif(t, comm_rounds, unif)
+        complete= GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
+        complete.play_unif(t, comm_rounds, unif)
 
-        # star = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "STAR", alpha = alpha)
-        # star.play_unif(t, comm_rounds, unif)
+        star = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "STAR", alpha = alpha)
+        star.play_unif(t, comm_rounds, unif)
 
-        # ring = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "RING", alpha = alpha)
-        # ring.play_unif(t, comm_rounds, unif)
+        ring = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "RING", alpha = alpha)
+        ring.play_unif(t, comm_rounds, unif)
 
-        # pickle.dump(complete, open(f"data/complete_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
-        # pickle.dump(star, open(f"data/star_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
-        # pickle.dump(ring, open(f"data/ring_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+        pickle.dump(complete, open(f"data/complete_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+        pickle.dump(star, open(f"data/star_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+        pickle.dump(ring, open(f"data/ring_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
 
 if __name__ == "__main__":
     task_num = int(sys.argv[1])
