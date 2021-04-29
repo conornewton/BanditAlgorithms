@@ -17,6 +17,25 @@ def adjust_comm_budget(length, eps):
         comm_rounds.append(math.floor(len(comm_rounds) ** 3))
     return comm_rounds
 
+def simulate_comm(delta, high, low, alpha, i, t = 100000, k = 50, n = 20, file_path = "./data/gie2conn"):
+    comm_rounds = adjust_comm_budget(t, 0.1)
+
+    arms = param_arms(delta, high, low, k)
+    unif = [[np.random.uniform() for _ in range(t)] for _ in range(k)]
+
+    complete= GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "COMPLETE", alpha = alpha)
+    complete.play_unif(t, comm_rounds, unif)
+
+    star = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "STAR", alpha = alpha)
+    star.play_unif(t, comm_rounds, unif)
+
+    ring = GosInE(n, arms, node_type = "KL-UCB", gossip_matrix = "RING", alpha = alpha)
+    ring.play_unif(t, comm_rounds, unif)
+
+    pickle.dump(complete, open(f"data/complete_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+    pickle.dump(star, open(f"data/star_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+    pickle.dump(ring, open(f"data/ring_{t}_{k}_{n}_{delta:.2f}_{high:.2f}_{low:.2f}_{alpha:.2f}_{i}.p", "wb"))
+
 def simulate2(delta, high, low, alpha, i, t = 100000, k = 20, n = 5, file_path = "./data/gie2"):
     comm_rounds = adjust_comm_budget(t, 0.1)
     arms = param_arms(delta, high, low, k)
@@ -76,7 +95,6 @@ if __name__ == "__main__":
     alphas = [1]
 
     param_array = list(itertools.product([0.1], [0.9], [0.2], alphas))
-
     params = param_array[0]
 
-    simulate2(0.1, 0.9, 0.2, 1, 0)
+    simulate_comm(0.1, 0.9, 0.2, 1, task_num % 100, n = 20, k = 50)
