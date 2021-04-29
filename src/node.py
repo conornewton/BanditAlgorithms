@@ -19,7 +19,6 @@ class Node:
         self.rewards_per_arm = [0] * k
         self.times_played = [0] * k
         self.empirical_means = [0] * k
-
         self.phase = 0
         self.times_played_phase = [0] * k
 
@@ -28,7 +27,6 @@ class Node:
     def recieve_reward(self, arm_id, reward):
         self.history.append(arm_id)
         self.rewards.append(reward)
-
         self.rewards_per_arm[arm_id] += reward
         self.times_played[arm_id] += 1
         self.times_played_phase[arm_id] += 1
