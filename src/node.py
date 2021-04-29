@@ -32,7 +32,6 @@ class Node:
         self.times_played_phase[arm_id] += 1
         self.empirical_means[arm_id] = self.rewards_per_arm[arm_id] / self.times_played[arm_id]
 
-
     def give_recommendation(self):
         return self.times_played_phase.index(max(self.times_played_phase))
 
@@ -45,6 +44,13 @@ class Node:
             self.arms[-2] = arm_id
         else:
             self.arms[-1] = arm_id
+
+    def recieve_recommendation2(self, arm_id, comm_node):
+        self.recommendations_recieved.append(arm_id)
+        self.recommendations_recieved_node.append(comm_node)
+
+        self.arms[-2] = self.give_recommendation() # Keep the most played arm
+        self.arms[-1] = arm_id
 
 
     def next_phase(self):
